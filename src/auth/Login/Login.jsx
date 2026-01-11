@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router";
 
 const Login = () => {
   const {
@@ -21,7 +22,7 @@ const Login = () => {
               type="email"
               //   defaultValue={demoEmail}
               {...register("email", { required: true })}
-              className="input outline-none border border-[#B13BFF] w-full shadow-xl bg-black text-white placeholder-white"
+              className="input outline-none w-full shadow-xl"
               placeholder="Email"
             />
             {errors.email && (
@@ -32,7 +33,7 @@ const Login = () => {
               type="password"
               //   defaultValue={demoPass}
               {...register("password", { required: true })}
-              className="input outline-none border border-[#B13BFF] w-full shadow-xl bg-black text-white placeholder-white"
+              className="input outline-none w-full shadow-xl"
               placeholder="Password"
             />
             {errors.password && (
