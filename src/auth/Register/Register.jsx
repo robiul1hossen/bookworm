@@ -66,6 +66,32 @@ const Register = () => {
         toast.error(error.message);
       });
   };
+  const handleGoogleLogin = () => {
+    loginWithGoogle()
+      .then((res) => {
+        const userInfoToDB = {
+          displayName: res.user.displayName,
+          photoURL: res.user.photoURL,
+          email: res.user.email,
+          role: "Borrower",
+        };
+        //   axiosSecure.post("/users", userInfoToDB).then(() => {});
+        const updateUserInfo = {
+          displayName: res.user.displayName,
+          photoURL: res.user.photoURL,
+        };
+        updateUser(updateUserInfo)
+          .then(() => {
+            navigate(`${location?.state ? location?.state : "/"}`);
+            setLoading(false);
+          })
+          .catch((error) => {
+            setLoading(false);
+            console.log(error);
+          });
+      })
+      .catch((error) => toast.error(error.message));
+  };
 
   return (
     <div>
@@ -144,7 +170,7 @@ const Register = () => {
             Sign up
           </button>
           <button
-            // onClick={handleGoogleLogin}
+            onClick={handleGoogleLogin}
             className="btn bg-[#471396] text-white border-[#e5e5e5] shadow-xl w-full mt-2">
             <svg
               aria-label="Google logo"
