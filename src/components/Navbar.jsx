@@ -1,20 +1,48 @@
+import { use } from "react";
 import { NavLink } from "react-router";
+import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
+  const { user, logoutUser } = use(AuthContext);
+  const handleLogout = () => {
+    logoutUser()
+      .then(() => toast.success("Successfully Sign Out"))
+      .catch((error) => toast.error(error.message));
+  };
   const links = (
     <>
-      <li>
-        <NavLink to="/">Home</NavLink>
-      </li>
-      <li>
-        <NavLink to="/all-books">All Books</NavLink>
-      </li>
-      <li>
-        <NavLink to="/about">About</NavLink>
-      </li>
-      <li>
-        <NavLink to="/auth/login">Login</NavLink>
-      </li>
+      <NavLink to="/">
+        <li className="font-semibold mx-2">Home</li>
+      </NavLink>
+      <NavLink to="/all-books">
+        <li className="font-semibold mx-2">All Books</li>
+      </NavLink>
+      <NavLink to="/about">
+        <li className="font-semibold mx-2">About</li>
+      </NavLink>
+      {user ? (
+        <>
+          <NavLink onClick={handleLogout} to="/auth/login">
+            <li className="font-semibold mx-2">Logout</li>
+          </NavLink>
+          <img
+            src={user?.photoURL}
+            alt=""
+            className="w-8 h-8 rounded-full cursor-pointer"
+            referrerPolicy="no-referrer"
+          />
+        </>
+      ) : (
+        <>
+          <NavLink to="/auth/login">
+            <li className="font-semibold mx-2">Login</li>
+          </NavLink>
+          <NavLink to="/auth/register">
+            <li className="font-semibold mx-2">Register</li>
+          </NavLink>
+        </>
+      )}
     </>
   );
   return (

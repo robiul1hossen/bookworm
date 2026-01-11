@@ -32,7 +32,7 @@ const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, gootleProvider);
   };
 
-  const logoutUSer = () => {
+  const logoutUser = () => {
     setLoading(true);
     return signOut(auth);
   };
@@ -54,10 +54,10 @@ const AuthProvider = ({ children }) => {
     CreateUer,
     loginUser,
     loginWithGoogle,
+    logoutUser,
     updateUser,
     user,
     loading,
-    logoutUSer,
   };
   return <AuthContext value={authInfo}>{children}</AuthContext>;
 };
