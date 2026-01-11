@@ -1,0 +1,185 @@
+import React, { use } from "react";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router";
+// import useAxiosSecure from "../hooks/useAxiosSecure";
+import { toast } from "react-toastify";
+import { AuthContext } from "../../context/AuthContext";
+
+const Register = () => {
+  const { CreateUer, loginWithGoogle, updateUser, setLoading, user } =
+    use(AuthContext);
+  console.log(user);
+  const location = useLocation();
+  const navigate = useNavigate();
+  //   const axiosSecure = useAxiosSecure();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const handleRegister = (data) => {
+    const upperCase = /(?=.*[A-Z])/;
+    const lowercase = /(?=.*[a-z])/;
+    const sixCha = /.{6,}/;
+    if (!sixCha.test(data.password)) {
+      return toast.error("Password must be at least 6 character");
+    }
+    if (!lowercase.test(data.password)) {
+      return toast.error("Password must be one lowercase");
+    }
+    if (!upperCase.test(data.password)) {
+      return toast.error("Password must be one Uppercase");
+    }
+
+    const profileImage = data.photo[0];
+
+    CreateUer(data.email, data.password)
+      .then(() => {
+        const formData = new FormData();
+        formData.append("image", profileImage);
+        const imageHostingURL = `https://api.imgbb.com/1/upload?key=${
+          import.meta.env.VITE_host_image
+        }`;
+        toast.success("Registration successful");
+        axios.post(imageHostingURL, formData).then((res) => {
+          const userPhotoURL = res.data?.data?.url;
+          const updateUserInfo = {
+            displayName: data.name,
+            photoURL: userPhotoURL,
+          };
+          const userInfoToDB = {
+            displayName: data.name,
+            photoURL: userPhotoURL,
+            email: data.email,
+            // role: data.role,
+          };
+          // update user
+          updateUser(updateUserInfo)
+            .then(() => {
+              navigate(`${location?.state ? location?.state : "/"}`);
+            })
+            .catch((error) => console.log(error));
+        });
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold text-center mb-4">Sign Up Now!</h2>
+      <div className="px-6 md:px-20 min-h-screen">
+        <form onSubmit={handleSubmit(handleRegister)}>
+          <fieldset className="fieldset">
+            <label className="label">Name</label>
+            <input
+              type="text"
+              {...register("name", { required: true })}
+              className="input outline-none w-full shadow-xl "
+              placeholder="Your Name"
+            />
+            {errors.name && (
+              <span className="text-xs text-red-500">Name is required</span>
+            )}
+
+            <label className="label">Email</label>
+            <input
+              type="email"
+              {...register("email", { required: true })}
+              className="input outline-none  w-full shadow-xl "
+              placeholder="Email"
+            />
+            {errors.email && (
+              <span className="text-xs text-red-500">Email is required</span>
+            )}
+            <label className="label">Password</label>
+            <input
+              type="password"
+              {...register("password", { required: true })}
+              className="input outline-none w-full shadow-xl "
+              placeholder="Password"
+            />
+            {errors.password && (
+              <span className="text-xs text-red-500">Password is required</span>
+            )}
+            <div>
+              <a className="link link-hover">Forgot password?</a>
+            </div>
+            <div className="flex flex-col md:flex-row gap-2 items-center">
+              <div className="flex-1 w-full">
+                <label className="label">Photo</label>
+                <input
+                  type="file"
+                  {...register("photo", { required: true })}
+                  className="file-input file-input-primary outline-none w-full shadow-xl "
+                />
+                {errors.photo && (
+                  <span className="text-xs text-red-500">
+                    Photo is required
+                  </span>
+                )}
+              </div>
+              {/* <div className="flex-1 w-full">
+                <label className="label">Select Your Role</label>
+                <select
+                  className="select select-primary shadow-xl "
+                  defaultValue=""
+                  {...register("role", { required: true })}>
+                  <option value="" disabled>
+                    Pick Your Role
+                  </option>
+                  <option value="Borrower">Borrower</option>
+                  <option value="Manager">Manager</option>
+                </select>
+
+                {errors.role && (
+                  <span className="text-xs text-red-500">Role is required</span>
+                )}
+              </div> */}
+            </div>
+          </fieldset>
+          <button className="btn bg-[#471396] border-[#e5e5e5] text-white mt-4 w-full shadow-xl">
+            Sign up
+          </button>
+          <button
+            // onClick={handleGoogleLogin}
+            className="btn bg-[#471396] text-white border-[#e5e5e5] shadow-xl w-full mt-2">
+            <svg
+              aria-label="Google logo"
+              width="16"
+              height="16"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512">
+              <g>
+                <path d="m0 0H512V512H0" fill="#fff"></path>
+                <path
+                  fill="#34a853"
+                  d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path>
+                <path
+                  fill="#4285f4"
+                  d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path>
+                <path
+                  fill="#fbbc02"
+                  d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path>
+                <path
+                  fill="#ea4335"
+                  d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path>
+              </g>
+            </svg>
+            Login with Google
+          </button>
+          <p>
+            Already have an account? Please{" "}
+            <Link to="/auth/login" className="text-[#B13BFF]">
+              Login
+            </Link>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
